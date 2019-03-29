@@ -1,12 +1,12 @@
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
-#include <cairo.h>
-#include <cairo-xlib.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
+#include <pango/pangocairo.h>
+#include <cairo.h>
+#include <cairo-xlib.h>
 
 int event_loop(cairo_surface_t *sfc, int block)
 {
@@ -84,6 +84,29 @@ cairo_surface_t *cairo_create_surface(int x, int y)
    return sfc;
 }
 
+void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string)
+{
+  PangoLayout* layout;
+  PangoFontDescription* font_desc;
+
+  cairo_set_source_rgba(cr, 0, 0, 0, 0);
+  cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+  cairo_paint(cr);
+  
+  layout = pango_cairo_create_layout(cr);
+  
+  pango_layout_set_markup(layout, string, -1);
+  font_desc = pango_font_description_from_string("Hasklug Nerd Font, BOLD, 11");
+  pango_layout_set_font_description(layout, font_desc);
+  pango_font_description_free(font_desc);
+  
+  cairo_set_source_rgb(cr, 1, 1, 1);
+  cairo_move_to(cr, 48, 14);
+  //pango_cairo_update_layout (cr, layout);
+  pango_cairo_show_layout(cr, layout);
+  cairo_surface_flush(sfc);
+}
+
 void cairo_close(cairo_surface_t *sfc)
 {
    Display *dsp = cairo_xlib_surface_get_display(sfc);
@@ -92,7 +115,7 @@ void cairo_close(cairo_surface_t *sfc)
    XCloseDisplay(dsp);
 }
 
-void input(char *string,int length)
+int input(char *string,int length)
 {
   int x = 0;
   
@@ -102,55 +125,39 @@ void input(char *string,int length)
       if(*string == '\n')
         {
           *string = '\0';
-          return;
+          return 1;
         }
       x++;
       if(x == length)
         {
           *string = '\0';
-          return;
+          return 1;
         }
       string++;
     }
+  return 0;
 }
 
 int main(int argc, char **argv)
 {
    cairo_surface_t *sfc;
-   cairo_t *ctx;
+   cairo_t *cr;
 
    sfc = cairo_create_surface(0, 0);
-   ctx = cairo_create(sfc);
+   cr = cairo_create(sfc);
 
-   char line[255];
+   char string[255];
 
    while (1)
    {
-
-     // READ
-     input(line, sizeof(line));
-
-     // CLEAR
-     cairo_set_source_rgba (ctx, 0, 0, 0, 0);
-     cairo_set_operator (ctx, CAIRO_OPERATOR_SOURCE);
-     cairo_paint (ctx);
-
-     // DRAW
-     cairo_set_source_rgb(ctx, 1, 1, 1);
-     cairo_select_font_face(ctx, "Hasklug Nerd Font",
-                            CAIRO_FONT_SLANT_NORMAL,
-                            CAIRO_FONT_WEIGHT_BOLD);
-     cairo_set_font_size(ctx, 14);
-     cairo_move_to(ctx, 48, 28);
-     cairo_show_text(ctx, line);
-     cairo_stroke(ctx);
-     cairo_surface_flush(sfc);
-
-     event_loop(sfc, 0);
-
+     if (input(string, sizeof(string)))
+       {
+         cairo_draw_text(sfc, cr, string);
+         event_loop(sfc, 0);
+       }
    }
 
-   cairo_destroy(ctx);
+   cairo_destroy(cr);
    cairo_close(sfc);
 
    return 0;
