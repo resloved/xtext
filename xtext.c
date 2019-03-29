@@ -4,6 +4,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#include <X11/extensions/shape.h>
+#include <X11/extensions/Xfixes.h>
 #include <pango/pangocairo.h>
 #include <cairo.h>
 #include <cairo-xlib.h>
@@ -21,7 +23,7 @@ int event_loop(cairo_surface_t *sfc, int block)
    }
 }
 
-cairo_surface_t *cairo_create_surface(int x, int y)
+cairo_surface_t *cairo_create_surface()
 {
    Display *dsp;
    Drawable da;
@@ -49,13 +51,13 @@ cairo_surface_t *cairo_create_surface(int x, int y)
    attr.background_pixel = 0;
    attr.override_redirect = 1;
    
-   int width = 1920;
+   int width  = 1920;
    int height = 1080;
    
    da = 
      XCreateWindow (dsp,
                     DefaultRootWindow(dsp),
-                    x, y,
+                    0, 0,
                     width, height,
                     0,
                     vinfo.depth,
@@ -81,10 +83,15 @@ cairo_surface_t *cairo_create_surface(int x, int y)
    sfc = cairo_xlib_surface_create(dsp, da, vinfo.visual, width, height);
    cairo_xlib_surface_set_size(sfc, width, height);
 
+   XRectangle rect;
+   XserverRegion region = XFixesCreateRegion(dsp, &rect, 1);
+   XFixesSetWindowShapeRegion(dsp, da, ShapeInput, 0, 0, region);
+   XFixesDestroyRegion(dsp, region);
+
    return sfc;
 }
 
-void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string)
+void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int y)
 {
   PangoLayout* layout;
   PangoFontDescription* font_desc;
@@ -101,8 +108,7 @@ void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string)
   pango_font_description_free(font_desc);
   
   cairo_set_source_rgb(cr, 1, 1, 1);
-  cairo_move_to(cr, 48, 14);
-  //pango_cairo_update_layout (cr, layout);
+  cairo_move_to(cr, x, y);
   pango_cairo_show_layout(cr, layout);
   cairo_surface_flush(sfc);
 }
@@ -143,7 +149,7 @@ int main(int argc, char **argv)
    cairo_surface_t *sfc;
    cairo_t *cr;
 
-   sfc = cairo_create_surface(0, 0);
+   sfc = cairo_create_surface();
    cr = cairo_create(sfc);
 
    char string[255];
@@ -152,7 +158,7 @@ int main(int argc, char **argv)
    {
      if (input(string, sizeof(string)))
        {
-         cairo_draw_text(sfc, cr, string);
+         cairo_draw_text(sfc, cr, string, atoi(argv[1]), atoi(argv[2]));
          event_loop(sfc, 0);
        }
    }
