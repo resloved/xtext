@@ -50,9 +50,12 @@ cairo_surface_t *cairo_create_surface()
    attr.border_pixel = 0;
    attr.background_pixel = 0;
    attr.override_redirect = 1;
-   
-   int width  = 1920;
-   int height = 1080;
+
+   int screen_num = DefaultScreen(dsp);
+   Screen* pScreen = ScreenOfDisplay(dsp, screen_num);
+
+   int width  = pScreen->width;
+   int height = pScreen->height;
    
    da = 
      XCreateWindow (dsp,
@@ -85,6 +88,7 @@ cairo_surface_t *cairo_create_surface()
 
    XRectangle rect;
    XserverRegion region = XFixesCreateRegion(dsp, &rect, 1);
+
    XFixesSetWindowShapeRegion(dsp, da, ShapeInput, 0, 0, region);
    XFixesDestroyRegion(dsp, region);
 
@@ -103,7 +107,7 @@ void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int
   layout = pango_cairo_create_layout(cr);
   
   pango_layout_set_markup(layout, string, -1);
-  font_desc = pango_font_description_from_string("Hasklug Nerd Font, BOLD, 11");
+  font_desc = pango_font_description_from_string("Hasklug Nerd Font Mono, 11");
   pango_layout_set_font_description(layout, font_desc);
   pango_font_description_free(font_desc);
   
