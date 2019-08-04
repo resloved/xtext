@@ -1,8 +1,8 @@
 # xtext
 
-Overlay text on your X display, that's it.
-
-![example](screenshots/example.png)
+<p align="center">
+  <src="screenshots/example.png">
+</p>
 
 ## Build
 
@@ -12,7 +12,7 @@ cc -o xtext $(pkg-config --cflags --libs cairo pango x11 xfixes) xtext.c
 
 ## Usage
 
-Pipe text into xtext and give it the coordinates of where to display.
+Pipe text into xtext and give it the coordinates of where to display:
 
 ```bash
 input | xtext x y alignment
@@ -41,7 +41,7 @@ while true; do echo $(date +%M:%S); sleep 1; done | xtext 0 0
 xtext also takes advantage of Pango, a library for rendering and organizing text. Pango comes with its own markup language allowing us to add attributes to the displayed text.
 
 ```bash
-(echo "<span color='red'>Hello World!</span>") | xtext 0 0
+(echo "<span color='red'>Hello World!</span>"; cat) | xtext 0 0
 ```
 
 The Gnome Developer [docs](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) have a page dedicated to all the different Pango markup attributes. Changing the attributes becomes very powerful when paired with an updating stream of text. You can make some really interesting UI elements by changing how the text is displayed on the fly.
@@ -66,49 +66,57 @@ while line in sys.stdin:
       print(line, flush=True)
 ```
 
-### Basics
-
 All of the following effects can be found in [examples/animation/](examples/animation/)
 
-#### Fade
-
-To fade text in and out use the Pango 'alpha' attribute.
+### Fade
 
 ```bash
-anim 'fade' | fade | xtext 0 0
+anim 'fade' | fade | xtext 0 0 
 ```
 
-![fade](screenshots/fade.gif)
+<p align="center">
+  <src="screenshots/fade.gif">
+</p>
 
-#### Transition
-
-To move text up and down use the Pango 'rise' attribute.
+### Transition
 
 ```bash
-anim 'transition' | transition | xtext 0 0 
+anim 'transition' | transition -d -10 | xtext 0 0 
 ```
 
-![transition](screenshots/transition.gif)
+<p align="center">
+  <src="screenshots/transition.gif">
+</p>
 
 ### Combine
 
 ```bash
-anim 'fade &amp; transition' | fade | transition | xtext 0 0
+anim 'fade &amp; transition' | fade | transition -d -10 | xtext 0 0 
 ```
 
-![combine](screenshots/combine.gif)
+<p align="center">
+  <src="screenshots/combine.gif">
+</p>
 
-### Other Examples
+### Wave
 
-There's a lot of room for creativity! Here are a few more possibilities:
+```bash
+anim 'waving' | wave | xtext 0 0 
+```
 
-#### Wave
+<p align="center">
+  <src="screenshots/wave.gif">
+</p>
 
-![wave](screenshots/wave.gif)
+### Rainbow
 
-#### Rainbow
+```bash
+anim 'rainbow' | rainbow | xtext 0 0 
+```
 
-![rainbow](screenshots/rainbow.gif)
+<p align="center">
+  <src="screenshots/rainbow.gif">
+</p>
 
 ## Resources
 
