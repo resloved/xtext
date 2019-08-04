@@ -95,7 +95,7 @@ cairo_surface_t *cairo_create_surface()
    return sfc;
 }
 
-void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int y)
+void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int y, int alignment)
 {
   PangoLayout* layout;
   PangoFontDescription* font_desc;
@@ -106,13 +106,23 @@ void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int
   
   layout = pango_cairo_create_layout(cr);
   
+  pango_layout_set_alignment(layout, alignment);
   pango_layout_set_markup(layout, string, -1);
-  font_desc = pango_font_description_from_string("Hasklug Nerd Font Mono, 11");
-  pango_layout_set_font_description(layout, font_desc);
-  pango_font_description_free(font_desc);
-  
+
+  int w = 0;
+  int h = 0;
+
+  pango_layout_get_pixel_size(layout, &w, &h);
+
+  if (alignment == 1) {
+    cairo_move_to(cr, x - w, y);
+  } else if (alignment == 2) {
+    cairo_move_to(cr, x - w / 2, y);
+  } else {
+    cairo_move_to(cr, x, y);
+  }
+
   cairo_set_source_rgb(cr, 1, 1, 1);
-  cairo_move_to(cr, x, y);
   pango_cairo_show_layout(cr, layout);
   cairo_surface_flush(sfc);
 }
@@ -125,46 +135,24 @@ void cairo_close(cairo_surface_t *sfc)
    XCloseDisplay(dsp);
 }
 
-int input(char *string,int length)
-{
-  int x = 0;
-  
-  fgets(string,length,stdin);
-  while(*string)
-    {
-      if(*string == '\n')
-        {
-          *string = '\0';
-          return 1;
-        }
-      x++;
-      if(x == length)
-        {
-          *string = '\0';
-          return 1;
-        }
-      string++;
-    }
-  return 0;
-}
-
 int main(int argc, char **argv)
 {
    cairo_surface_t *sfc;
    cairo_t *cr;
+
+   int x = atoi(argv[1]);
+   int y = atoi(argv[2]);
+   int a = (argc > 3) ? atoi(argv[3]) : 0;
 
    sfc = cairo_create_surface();
    cr = cairo_create(sfc);
 
    char string[255];
 
-   while (1)
+   while (fgets(string, sizeof(string), stdin))
    {
-     if (input(string, sizeof(string)))
-       {
-         cairo_draw_text(sfc, cr, string, atoi(argv[1]), atoi(argv[2]));
-         event_loop(sfc, 0);
-       }
+     cairo_draw_text(sfc, cr, string, x, y, a);
+     event_loop(sfc, 0);
    }
 
    cairo_destroy(cr);

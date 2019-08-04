@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import argparse, time, math, sys
+
+def curve(pct, start, distance):
+    return quad_ease(pct if pct == 1 else pct % 1) * distance - start
+
+# https://github.com/semitable/easing-functions/
+def quad_ease(t):
+    return 2 * t * t if t < 0.5 else (-2 * t * t) + (4 * t) - 1
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Pango Rise Wrapper')
+    parser.add_argument('-d', '--distance',  type=int, default=5)
+    parser.add_argument('-l', '--length',    type=int, default=1)
+    parser.add_argument('-c', '--scale',     type=int, default=10000)
+    
+    args = parser.parse_args()
+    
+    length = args.length
+
+    scale = args.scale
+    distance = args.distance
+    start = 0 if distance < 0 else distance
+
+    now = time.time()
+    delta = 0
+    pct = 0
+    pos = 0
+
+    for line in sys.stdin:
+        delta = time.time() - now
+        pct = delta / length
+        pct = pct if pct <= 1 else 1
+        pos = round(curve(pct, start, distance) * scale)
+        fade = "<span rise='{}'>{}</span>".format(pos, line.strip())
+        print(fade, flush=True)

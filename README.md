@@ -2,6 +2,8 @@
 
 Overlay text on your X display, that's it.
 
+![example](screenshots/example.png)
+
 ## Build
 
 ``` bash
@@ -13,16 +15,22 @@ cc -o xtext $(pkg-config --cflags --libs cairo pango x11 xfixes) xtext.c
 Pipe text into xtext and give it the coordinates of where to display.
 
 ```bash
-input | xtext x y
+input | xtext x y alignment
 ```
 
-Standard xtext structure.
+Alignment is an optional arguement with the following options (By default xtext uses left-alignment):
+
++ 0 = Left
++ 1 = Right
++ 2 = Center
+
+Standard xtext structure:
 
 ```bash
-echo "Hello World!" | xtext 0 0
+(echo "Hello World!"; cat) | xtext 0 0
 ```
 
-xtext is able to handle streams of text, allowing you to update what it displays.
+xtext is able to handle streams of text, allowing you to update what it displays:
 
 ```bash
 while true; do echo $(date +%M:%S); sleep 1; done | xtext 0 0
@@ -33,19 +41,74 @@ while true; do echo $(date +%M:%S); sleep 1; done | xtext 0 0
 xtext also takes advantage of Pango, a library for rendering and organizing text. Pango comes with its own markup language allowing us to add attributes to the displayed text.
 
 ```bash
-echo "<span color='red'>Hello World!</span>" | xtext 0 0
+(echo "<span color='red'>Hello World!</span>") | xtext 0 0
 ```
 
 The Gnome Developer [docs](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) have a page dedicated to all the different Pango markup attributes. Changing the attributes becomes very powerful when paired with an updating stream of text. You can make some really interesting UI elements by changing how the text is displayed on the fly.
 
 Take a look at the [examples/](examples/) if want to find a place to start.
 
-## Limitations
+## Animation
 
-+ Only aligned left
-+ Always uses a transparent background (Requires compositor)
-+ No argument switches
-+ No configuration file
+To animate text I use the following structure:
+
+```bash
+anim 'example' | effect | xtext 0 0 
+```
+
+`anim` is a helper that prints a given string 60 times a second. While this isn't necessary for animation, it's useful for updating a static string at a consistent rate.
+
+Each effect reads in from STDIN, updates the given line in some way (often using a <span> wrapper) and then prints the new line. This can be accomplished in python using:
+
+```python
+while line in sys.stdin:
+      # Update line somehow...
+      print(line, flush=True)
+```
+
+### Basics
+
+All of the following effects can be found in [examples/animation/](examples/animation/)
+
+#### Fade
+
+To fade text in and out use the Pango 'alpha' attribute.
+
+```bash
+anim 'fade' | fade | xtext 0 0
+```
+
+![fade](screenshots/fade.gif)
+
+#### Transition
+
+To move text up and down use the Pango 'rise' attribute.
+
+```bash
+anim 'transition' | transition | xtext 0 0 
+```
+
+![transition](screenshots/transition.gif)
+
+### Combine
+
+```bash
+anim 'fade &amp; transition' | fade | transition | xtext 0 0
+```
+
+![combine](screenshots/combine.gif)
+
+### Other Examples
+
+There's a lot of room for creativity! Here are a few more possibilities:
+
+#### Wave
+
+![wave](screenshots/wave.gif)
+
+#### Rainbow
+
+![rainbow](screenshots/rainbow.gif)
 
 ## Resources
 

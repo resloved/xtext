@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+# https://krazydad.com/tutorials/makecolors.php
+import math, sys
+
+f = .1
+i = 0
+
+if __name__ == "__main__":
+    
+    for line in sys.stdin:
+        r = round(math.sin(f * i + 0) * 127 + 128)
+        g = round(math.sin(f * i + 2) * 127 + 128)
+        b = round(math.sin(f * i + 4) * 127 + 128)
+        
+        col = '#%02x%02x%02x' % (r, g, b)
+        bow = '<span color="{}">{}</span>'.format(col, line.strip())
+        print(bow, flush=True)
+        i += 1

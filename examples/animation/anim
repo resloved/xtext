@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+import argparse, time, math, sys
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Repeat text output')
+    parser.add_argument('input')
+    parser.add_argument('-l', '--length', type=int, default=0)
+    parser.add_argument('-r', '--rate', type=int, default=60)
+
+    args = parser.parse_args()
+
+    start = time.time()
+    delta = 0
+    while args.length is 0 or args.length > delta:
+          delta = time.time() - start 
+          print(args.input, flush=True)
+          time.sleep(1/args.rate)
