@@ -1,7 +1,7 @@
 # xtext
 
 <p align="center">
-  <src="screenshots/example.png">
+  <img src="screenshots/example.png">
 </p>
 
 ## Build
@@ -75,7 +75,7 @@ anim 'fade' | fade | xtext 0 0
 ```
 
 <p align="center">
-  <src="screenshots/fade.gif">
+  <img src="screenshots/fade.gif">
 </p>
 
 ### Transition
@@ -85,7 +85,7 @@ anim 'transition' | transition -d -10 | xtext 0 0
 ```
 
 <p align="center">
-  <src="screenshots/transition.gif">
+  <img src="screenshots/transition.gif">
 </p>
 
 ### Combine
@@ -95,7 +95,7 @@ anim 'fade &amp; transition' | fade | transition -d -10 | xtext 0 0
 ```
 
 <p align="center">
-  <src="screenshots/combine.gif">
+  <img src="screenshots/combine.gif">
 </p>
 
 ### Wave
@@ -105,7 +105,7 @@ anim 'waving' | wave | xtext 0 0
 ```
 
 <p align="center">
-  <src="screenshots/wave.gif">
+  <img src="screenshots/wave.gif">
 </p>
 
 ### Rainbow
@@ -115,7 +115,7 @@ anim 'rainbow' | rainbow | xtext 0 0
 ```
 
 <p align="center">
-  <src="screenshots/rainbow.gif">
+  <img src="screenshots/rainbow.gif">
 </p>
 
 ## Resources
