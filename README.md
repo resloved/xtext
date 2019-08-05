@@ -20,9 +20,11 @@ input | xtext x y alignment
 
 Alignment is an optional arguement with the following options (By default xtext uses left-alignment):
 
-+ 0 = Left
-+ 1 = Right
-+ 2 = Center
+Input | Alignment
+----- | ---------
+0 | Left
+1 | Right
+2 | Center
 
 Standard xtext structure:
 
@@ -56,14 +58,14 @@ To animate text I use the following structure:
 anim 'example' | effect | xtext 0 0 
 ```
 
-`anim` is a helper that prints a given string 60 times a second. While this isn't necessary for animation, it's useful for updating a static string at a consistent rate.
+The helper `anim` prints a given string 60 times a second. While this isn't necessary for animation, it's useful for updating a static string at a consistent rate.
 
-Each effect reads in from STDIN, updates the given line in some way (often using a <span> wrapper) and then prints the new line. This can be accomplished in python using:
+Each effect reads in from STDIN, updates the given line in some way (often using a span) and then prints the new line. This can be accomplished in python using:
 
 ```python
-while line in sys.stdin:
+for line in sys.stdin:
       # Update line somehow...
-      print(line, flush=True)
+      print(line.strip(), flush=True)
 ```
 
 All of the following effects can be found in [examples/animation/](examples/animation/)
