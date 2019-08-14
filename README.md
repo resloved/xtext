@@ -122,7 +122,7 @@ anim 'rainbow' | rainbow | xtext 0 0
 
 ## Resources
 
-X and X11 documentation contain some very murky waters. Thankfully there were a couple hidden gems out there and I would have been completely lost without them.
+X documentation contain some very murky waters. Thankfully there were a couple hidden gems out there and I would have been completely lost without them.
 
 ### C
 
