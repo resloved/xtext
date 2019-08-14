@@ -4,11 +4,27 @@
   <img src="screenshots/example.png">
 </p>
 
+## Install
+
+### Arch/Manjaro
+
+xtext is available in the [AUR](https://aur.archlinux.org/packages/xtext-git/)
+
 ## Build
 
+### Dependencies
+
++ `Pango`
++ `Cairo`
++ `X`
+
+### Compile
+
 ``` bash
-cc -o xtext $(pkg-config --cflags --libs cairo pango x11 xfixes) xtext.c
+gcc -o xtext $(pkg-config --cflags --libs cairo pango x11 xfixes) xtext.c
 ```
+
+or just `make && make install`
 
 ## Usage
 

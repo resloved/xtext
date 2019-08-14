@@ -13,5 +13,3 @@ install:
 uninstall:
 	@echo uninstalling xtext
 	@rm -f ${DESTDIR}${PREFIX}/bin/xtext
-
-
