@@ -23,27 +23,25 @@ int event_loop(cairo_surface_t *sfc, int block)
    }
 }
 
-cairo_surface_t *cairo_create_surface()
+cairo_surface_t *cairo_create_surface(Display **dsp, Drawable *da)
 {
-   Display *dsp;
-   Drawable da;
    int screen;
    cairo_surface_t *sfc;
 
-   if ((dsp = XOpenDisplay(NULL)) == NULL)
+   if ((*dsp = XOpenDisplay(NULL)) == NULL)
       exit(1);
-   screen = DefaultScreen(dsp);
+   screen = DefaultScreen(*dsp);
 
 
    XVisualInfo vinfo;
-   XMatchVisualInfo(dsp,
+   XMatchVisualInfo(*dsp,
                     screen,
                     32, TrueColor, &vinfo);
    
    XSetWindowAttributes attr;
    attr.colormap =
-     XCreateColormap(dsp,
-                     DefaultRootWindow(dsp),
+     XCreateColormap(*dsp,
+                     DefaultRootWindow(*dsp),
                      vinfo.visual,
                      AllocNone);
    
@@ -51,17 +49,17 @@ cairo_surface_t *cairo_create_surface()
    attr.background_pixel = 0;
    attr.override_redirect = 1;
 
-   int screen_num = DefaultScreen(dsp);
-   Screen* pScreen = ScreenOfDisplay(dsp, screen_num);
+   int screen_num = DefaultScreen(*dsp);
+   Screen* pScreen = ScreenOfDisplay(*dsp, screen_num);
 
-   int width  = pScreen->width;
+   int width = pScreen->width;
    int height = pScreen->height;
-   
-   da = 
-     XCreateWindow (dsp,
-                    DefaultRootWindow(dsp),
+
+   *da = 
+     XCreateWindow (*dsp,
+                    DefaultRootWindow(*dsp),
                     0, 0,
-                    width, height,
+                    1, 1,
                     0,
                     vinfo.depth,
                     InputOutput,
@@ -69,8 +67,8 @@ cairo_surface_t *cairo_create_surface()
                     CWBorderPixel | CWBackPixel | CWColormap | CWOverrideRedirect,
                     &attr);
 
-   XSelectInput(dsp, da, ExposureMask);
-   XMapWindow(dsp, da);
+   XSelectInput(*dsp, *da, ExposureMask);
+   XMapWindow(*dsp, *da);
 
    XClassHint *classhint;
 
@@ -79,26 +77,28 @@ cairo_surface_t *cairo_create_surface()
      {
        classhint->res_name = "xtext";
        classhint->res_class = "xtext";
-       XSetClassHint(dsp, da, classhint);
+       XSetClassHint(*dsp, *da, classhint);
        XFree(classhint);
      }
 
-   sfc = cairo_xlib_surface_create(dsp, da, vinfo.visual, width, height);
+   sfc = cairo_xlib_surface_create(*dsp, *da, vinfo.visual, width, height);
    cairo_xlib_surface_set_size(sfc, width, height);
 
    XRectangle rect;
-   XserverRegion region = XFixesCreateRegion(dsp, &rect, 1);
+   XserverRegion region = XFixesCreateRegion(*dsp, &rect, 1);
 
-   XFixesSetWindowShapeRegion(dsp, da, ShapeInput, 0, 0, region);
-   XFixesDestroyRegion(dsp, region);
+   XFixesSetWindowShapeRegion(*dsp, *da, ShapeInput, 0, 0, region);
+   XFixesDestroyRegion(*dsp, region);
 
    return sfc;
 }
 
-void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int y, int alignment)
+void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, Display *dsp, Drawable da,
+                     char *string, int x, int y, int alignment)
 {
   PangoLayout* layout;
   PangoFontDescription* font_desc;
+  PangoRectangle extents;
 
   cairo_set_source_rgba(cr, 0, 0, 0, 0);
   cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
@@ -109,17 +109,19 @@ void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int
   pango_layout_set_alignment(layout, alignment);
   pango_layout_set_markup(layout, string, -1);
 
-  int w = 0;
-  int h = 0;
+  pango_layout_line_get_pixel_extents(pango_layout_get_line(layout, 0),
+                                      NULL,
+                                      &extents);
 
-  pango_layout_get_pixel_size(layout, &w, &h);
+  int w = extents.width;
+  int h = extents.height;
 
   if (alignment == 1) {
-    cairo_move_to(cr, x - w, y);
+    XMoveResizeWindow(dsp, da, x - w, y, w, h); 
   } else if (alignment == 2) {
-    cairo_move_to(cr, x - w / 2, y);
+    XMoveResizeWindow(dsp, da, x - w / 2, y, w, h); 
   } else {
-    cairo_move_to(cr, x, y);
+    XMoveResizeWindow(dsp, da, x, y, w, h); 
   }
 
   cairo_set_source_rgb(cr, 1, 1, 1);
@@ -127,10 +129,8 @@ void cairo_draw_text(cairo_surface_t *sfc, cairo_t *cr, char *string, int x, int
   cairo_surface_flush(sfc);
 }
 
-void cairo_close(cairo_surface_t *sfc)
+void cairo_close(cairo_surface_t *sfc, Display *dsp)
 {
-   Display *dsp = cairo_xlib_surface_get_display(sfc);
-
    cairo_surface_destroy(sfc);
    XCloseDisplay(dsp);
 }
@@ -140,23 +140,26 @@ int main(int argc, char **argv)
    cairo_surface_t *sfc;
    cairo_t *cr;
 
+   Display *dsp;
+   Drawable da;
+
    int x = atoi(argv[1]);
    int y = atoi(argv[2]);
    int a = (argc > 3) ? atoi(argv[3]) : 0;
 
-   sfc = cairo_create_surface();
+   sfc = cairo_create_surface(&dsp, &da);
    cr = cairo_create(sfc);
 
    char string[255];
 
    while (fgets(string, sizeof(string), stdin))
    {
-     cairo_draw_text(sfc, cr, string, x, y, a);
+     cairo_draw_text(sfc, cr, dsp, da, string, x, y, a);
      event_loop(sfc, 0);
    }
 
    cairo_destroy(cr);
-   cairo_close(sfc);
+   cairo_close(sfc, dsp);
 
    return 0;
 }
