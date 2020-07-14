@@ -24,4 +24,4 @@ if __name__ == "__main__":
 
     for line in sys.stdin:
         attributes = ' '.join([ f'{arg}="{getattr(args, arg)}"' for arg in vars(args) if getattr(args, arg) ])
-        print(f'<span {attributes}>{line}</span>', flush=True)
+        print(f'<span {attributes}>{line.strip()}</span>', flush=True)
