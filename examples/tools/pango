@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+
+import argparse, time, math, sys
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Python Pango Interface')
+
+    parser.add_argument('-fd', '--font-desc')
+    parser.add_argument('-ff', '--font-family')
+    parser.add_argument('-sz', '--size')
+    parser.add_argument('-sy', '--style')
+    parser.add_argument('-wg', '--weight')
+    parser.add_argument('-vr', '--varient')
+    parser.add_argument('-sr', '--strech')
+    parser.add_argument('-fg', '--foreground')
+    parser.add_argument('-bg', '--background')
+    parser.add_argument('-ul', '--underline')
+    parser.add_argument('-ri', '--rise')
+    parser.add_argument('-st', '--strikethrough')
+    parser.add_argument('-fb', '--fallback')
+
+    args = parser.parse_args()
+
+    for line in sys.stdin:
+        attributes = ' '.join([ f'{arg}="{getattr(args, arg)}"' for arg in vars(args) if getattr(args, arg) ])
+        print(f'<span {attributes}>{line}</span>', flush=True)
