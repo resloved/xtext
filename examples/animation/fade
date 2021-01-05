@@ -6,8 +6,8 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Pango Rise Wrapper')
     parser.add_argument('-start', '--start', type=float, default=0.5)
-    parser.add_argument('-w', '--wait',      type=float, default=1)
-    parser.add_argument('-end', '--end',     type=float, default=0.5)
+    parser.add_argument('-w',     '--wait',  type=float, default=1)
+    parser.add_argument('-end',   '--end',   type=float, default=0.5)
     
     args = parser.parse_args()
     
@@ -19,9 +19,5 @@ if __name__ == "__main__":
             pct = delta / args.start
         elif delta < args.start + args.wait:
             pct = 1
-        elif delta < args.start + args.wait + args.end:
-            pct = 1 - (delta - args.start - args.wait) / args.end
-        else:
-            pct = 0
-        fade = "<span alpha='{}%'>{}</span>".format(round(pct * 100), line.strip())
+        fade = "<span alpha='{}%'>{}</span>".format(round(max(pct, 0.01) * 100), line.strip())
         print(fade, flush=True)

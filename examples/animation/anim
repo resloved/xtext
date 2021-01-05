@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     start = time.time()
     delta = 0
-    while args.length is 0 or args.length > delta:
+    while args.length == 0 or args.length > delta:
           delta = time.time() - start 
           print(args.input, flush=True)
           time.sleep(1/args.rate)

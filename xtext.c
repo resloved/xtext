@@ -150,7 +150,7 @@ int main(int argc, char **argv)
    sfc = cairo_create_surface(&dsp, &da);
    cr = cairo_create(sfc);
 
-   char string[255];
+   char string[8192];
 
    while (fgets(string, sizeof(string), stdin))
    {

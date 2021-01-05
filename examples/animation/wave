@@ -6,7 +6,7 @@ import numpy as np
 
 if __name__ == "__main__":
 
-    f = 50
+    f = 20
     now = time.time()
     delta = 0
 
@@ -16,6 +16,6 @@ if __name__ == "__main__":
         wave = ""
         for i in range(len(line)):
             x = ((i + delta + 1) / len(line))
-            y = int(np.sin(np.pi * f * x) * 10000)
+            y = int(np.sin(np.pi * f * x) * 5000)
             wave += "<span rise='{}'>{}</span>".format(y, line[i])
         print(wave, flush=True)

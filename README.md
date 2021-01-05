@@ -62,7 +62,7 @@ xtext also takes advantage of Pango, a library for rendering and organizing text
 (echo "<span color='red'>Hello World!</span>"; cat) | xtext 0 0
 ```
 
-The Gnome Developer [docs](https://developer.gnome.org/pango/stable/PangoMarkupFormat.html) have a page dedicated to all the different Pango markup attributes. Changing the attributes becomes very powerful when paired with an updating stream of text. You can make some really interesting UI elements by changing how the text is displayed on the fly.
+The Gnome Developer [docs](https://developer.gnome.org/pango/stable/pango-Markup.html) have a page dedicated to all the different Pango markup attributes. Changing the attributes becomes very powerful when paired with an updating stream of text. You can make some really interesting UI elements by changing how the text is displayed on the fly.
 
 Take a look at the [examples/](examples/) if want to find a place to start.
 
@@ -71,7 +71,7 @@ Take a look at the [examples/](examples/) if want to find a place to start.
 To animate text I use the following structure:
 
 ```bash
-anim 'example' | effect | xtext 0 0 
+anim 'example' | effect | xtext 0 0
 ```
 
 The helper `anim` prints a given string 60 times a second. While this isn't necessary for animation, it's useful for updating a static string at a consistent rate.
@@ -89,7 +89,7 @@ All of the following effects can be found in [examples/animation/](examples/anim
 ### Fade
 
 ```bash
-anim 'fade' | fade | xtext 0 0 
+anim 'fade' | fade | xtext 0 0
 ```
 
 <p align="center">
@@ -99,7 +99,7 @@ anim 'fade' | fade | xtext 0 0
 ### Transition
 
 ```bash
-anim 'transition' | transition -d -10 | xtext 0 0 
+anim 'transition' | transition -d -10 | xtext 0 0
 ```
 
 <p align="center">
@@ -109,7 +109,7 @@ anim 'transition' | transition -d -10 | xtext 0 0
 ### Combine
 
 ```bash
-anim 'fade &amp; transition' | fade | transition -d -10 | xtext 0 0 
+anim 'fade &amp; transition' | fade | transition -d -10 | xtext 0 0
 ```
 
 <p align="center">
@@ -119,7 +119,7 @@ anim 'fade &amp; transition' | fade | transition -d -10 | xtext 0 0
 ### Wave
 
 ```bash
-anim 'waving' | wave | xtext 0 0 
+anim 'waving' | wave | xtext 0 0
 ```
 
 <p align="center">
@@ -129,7 +129,7 @@ anim 'waving' | wave | xtext 0 0
 ### Rainbow
 
 ```bash
-anim 'rainbow' | rainbow | xtext 0 0 
+anim 'rainbow' | rainbow | xtext 0 0
 ```
 
 <p align="center">
